@@ -1,3 +1,18 @@
+earth (customised: 925 hPa wind layer)
+=====
+
+This fork of [cambecc/earth](https://github.com/cambecc/earth) adds a **925 hPa** option to the Height menu and a
+script to fetch current GFS wind data without Java/grib2json:
+
+    pip install eccodes
+    python3 scripts/fetch-gfs-wind.py 925        # latest GFS cycle -> public/data/weather/current/
+    python3 scripts/fetch-gfs-wind.py surface    # refresh the surface layer too (any hPa level works)
+    npm install && node dev-server.js 8080
+
+Open http://localhost:8080/#current/wind/isobaric/925hPa/orthographic=103.8,1.35,900 to view 925 hPa winds over Singapore.
+
+---
+
 earth
 =====
 
