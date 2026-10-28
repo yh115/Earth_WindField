@@ -716,6 +716,7 @@
         var date = new Date(validityDate(grids)), isLocal = d3.select("#data-date").classed("local");
         var formatted = isLocal ? µ.toLocalISO(date) : µ.toUTCISO(date);
         d3.select("#data-date").text(formatted + " " + (isLocal ? "Local" : "UTC"));
+        d3.select("#top-date").text(formatted + " " + (isLocal ? "Local" : "UTC"));
         d3.select("#toggle-zone").text("⇄ " + (isLocal ? "UTC" : "Local"));
     }
 

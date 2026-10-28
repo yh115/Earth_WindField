@@ -103,6 +103,25 @@ body {
     text-decoration: none;
 }
 
+#top-date {
+    position: absolute;
+    top: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    font-size: 1.75rem;
+    color: #dddddd;
+    background-color: rgba(0, 0, 5, 0.6);
+    border-radius: 0.5rem/0.5rem;
+    padding: 0 1rem 0 1rem;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+#top-date:empty {
+    display: none;
+}
+
 #details {
     position: absolute;
     bottom: 3%;
