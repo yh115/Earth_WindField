@@ -1,7 +1,7 @@
 earth (customised: 925 hPa, GFS + ECMWF)
 =====
 
-This fork of [cambecc/earth](https://github.com/cambecc/earth) adds a **925 hPa** option to the Height menu, a
+This fork of [cambecc/earth](https://github.com/cambecc/earth) limits the Height menu to Sfc, 1000, **925**, 850, 700 and 500 hPa (all with data), adds a
 **Model | GFS – ECMWF** switch, and RH, MSLP and 3-hour **Precip** overlays. `scripts/fetch-weather.py` fetches
 NOAA GFS (NOMADS) or ECMWF IFS open data (CC BY 4.0) without Java/grib2json:
 
