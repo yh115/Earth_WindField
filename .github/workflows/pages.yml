@@ -33,8 +33,7 @@ jobs:
         continue-on-error: true  # keep the committed data if NOMADS is unavailable
         run: |
           pip install eccodes
-          python3 scripts/fetch-gfs-wind.py 925
-          python3 scripts/fetch-gfs-wind.py surface
+          python3 scripts/fetch-gfs-wind.py 925 surface --timeline --past-hours 48 --forecast-hours 72
 
       - uses: actions/configure-pages@v5
 
