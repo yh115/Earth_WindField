@@ -12,7 +12,10 @@ var µ = function() {
     var τ = 2 * Math.PI;
     var H = 0.0000360;  // 0.0000360°φ ~= 4m
     var DEFAULT_CONFIG = "current/wind/surface/level/orthographic";
-    var TOPOLOGY = isMobile() ? "/data/earth-topo-mobile.json?v2" : "/data/earth-topo.json?v2";
+    // Site root derived from this script's URL, so the app also works when hosted under a sub-path.
+    var SITE_ROOT = typeof document !== "undefined" && document.currentScript ?
+        document.currentScript.src.replace(/libs\/earth\/[^\/]+\/micro\.js.*$/, "") : "/";
+    var TOPOLOGY = SITE_ROOT + (isMobile() ? "data/earth-topo-mobile.json?v2" : "data/earth-topo.json?v2");
 
     /**
      * @returns {Boolean} true if the specified value is truthy.
@@ -620,6 +623,7 @@ var µ = function() {
     }
 
     return {
+        siteRoot: SITE_ROOT,
         isTruthy: isTruthy,
         isValue: isValue,
         coalesce: coalesce,
