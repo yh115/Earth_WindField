@@ -43,7 +43,8 @@ var products = function() {
      */
     function gfs1p0degPath(attr, type, surface, level) {
         var dir = attr.date, stamp = dir === "current" ? "current" : attr.hour;
-        var file = [stamp, type, surface, level, "gfs", "1.0"].filter(µ.isValue).join("-") + ".json";
+        var model = attr.model === "ecmwf" ? "ecmwf" : "gfs";
+        var file = [stamp, type, surface, level, model, "1.0"].filter(µ.isValue).join("-") + ".json";
         return [WEATHER_PATH, dir, file].join("/");
     }
 
@@ -78,6 +79,17 @@ var products = function() {
             refTime: time.data[0],
             forecastTime: 0,
             centerName: center
+        };
+    }
+
+    function scalarRecordBuilder(file) {
+        var record = file[0], data = record.data;
+        return {
+            header: record.header,
+            interpolate: bilinearInterpolateScalar,
+            data: function(i) {
+                return data[i];
+            }
         };
     }
 
@@ -207,18 +219,7 @@ var products = function() {
                     }),
                     paths: [gfs1p0degPath(attr, "relative_humidity", attr.surface, attr.level)],
                     date: gfsDate(attr),
-                    builder: function(file) {
-                        var vars = file.variables;
-                        var rh = vars.Relative_humidity_isobaric || vars.Relative_humidity_height_above_ground;
-                        var data = rh.data;
-                        return {
-                            header: netcdfHeader(vars.time, vars.lat, vars.lon, file.Originating_or_generating_Center),
-                            interpolate: bilinearInterpolateScalar,
-                            data: function(i) {
-                                return data[i];
-                            }
-                        };
-                    },
+                    builder: scalarRecordBuilder,
                     units: [
                         {label: "%", conversion: function(x) { return x; }, precision: 0}
                     ],
@@ -494,6 +495,40 @@ var products = function() {
             }
         },
 
+        "precipitation": {
+            matches: _.matches({param: "wind", overlayType: "precipitation"}),
+            create: function(attr) {
+                return buildProduct({
+                    field: "scalar",
+                    type: "precipitation",
+                    description: localize({
+                        name: {en: "Precipitation (3 h)", ja: "降水量 (3時間)"},
+                        qualifier: ""
+                    }),
+                    paths: [gfs1p0degPath(attr, "precipitation")],
+                    date: gfsDate(attr),
+                    builder: scalarRecordBuilder,
+                    units: [
+                        {label: "mm", conversion: function(x) { return x; }, precision: 1},
+                        {label: "in", conversion: function(x) { return x / 25.4; }, precision: 2}
+                    ],
+                    scale: {
+                        bounds: [0, 50],
+                        gradient: µ.segmentedColorScale([
+                            [0, [37, 4, 42]],
+                            [0.5, [41, 10, 130]],
+                            [2, [21, 84, 187]],
+                            [5, [24, 132, 14]],
+                            [10, [247, 251, 59]],
+                            [20, [235, 167, 21]],
+                            [35, [230, 71, 39]],
+                            [50, [255, 255, 255]]
+                        ])
+                    }
+                });
+            }
+        },
+
         "off": {
             matches: _.matches({overlayType: "off"}),
             create: function() {
@@ -557,6 +592,8 @@ var products = function() {
             case 7:
             case "US National Weather Service, National Centres for Environmental Prediction (NCEP)":
                 return "GFS / NCEP / US National Weather Service";
+            case 98:
+                return "ECMWF IFS open data (CC BY 4.0)";
             default:
                 return header.centerName;
         }

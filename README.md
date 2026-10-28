@@ -1,15 +1,17 @@
-earth (customised: 925 hPa wind layer)
+earth (customised: 925 hPa, GFS + ECMWF)
 =====
 
-This fork of [cambecc/earth](https://github.com/cambecc/earth) adds a **925 hPa** option to the Height menu and a
-script to fetch current GFS wind data without Java/grib2json:
+This fork of [cambecc/earth](https://github.com/cambecc/earth) adds a **925 hPa** option to the Height menu, a
+**Model | GFS – ECMWF** switch, and RH, MSLP and 3-hour **Precip** overlays. `scripts/fetch-weather.py` fetches
+NOAA GFS (NOMADS) or ECMWF IFS open data (CC BY 4.0) without Java/grib2json:
 
     pip install eccodes
-    python3 scripts/fetch-gfs-wind.py 925        # latest GFS cycle -> public/data/weather/current/
-    python3 scripts/fetch-gfs-wind.py surface    # refresh the surface layer too (any hPa level works)
+    python3 scripts/fetch-weather.py gfs 925 surface               # latest cycle -> public/data/weather/current/
+    python3 scripts/fetch-weather.py ecmwf 925 surface --timeline  # also past 48 h + 72 h forecast, 3-hourly
     npm install && node dev-server.js 8080
 
-Open http://localhost:8080/#current/wind/isobaric/925hPa/orthographic=103.8,1.35,900 to view 925 hPa winds over Singapore.
+Open http://localhost:8080/#current/wind/isobaric/925hPa/orthographic=103.8,1.35,900 to view 925 hPa winds over Singapore
+(add `/model=ecmwf` after `925hPa` for ECMWF). The GitHub Pages workflow runs both fetches four times a day.
 
 ---
 

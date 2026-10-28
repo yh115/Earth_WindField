@@ -935,7 +935,7 @@
             var changed = _.keys(configuration.changedAttributes()), rebuildRequired = false;
 
             // Build a new grid if any layer-related attributes have changed.
-            if (_.intersection(changed, ["date", "hour", "param", "surface", "level"]).length > 0) {
+            if (_.intersection(changed, ["date", "hour", "param", "surface", "level", "model"]).length > 0) {
                 rebuildRequired = true;
             }
             // Build a new grid if the new overlay type is different from the current one.
@@ -1091,6 +1091,10 @@
             var id = this.id, parts = id.split("-");
             bindButtonToConfiguration("#" + id, {param: "wind", surface: parts[0], level: parts[1]});
         });
+
+        // Add handlers for the weather model buttons.
+        bindButtonToConfiguration("#model-gfs", {model: "gfs"});
+        bindButtonToConfiguration("#model-ecmwf", {model: "ecmwf"});
 
         // Add handlers for ocean animation types.
         bindButtonToConfiguration("#animate-currents", {param: "ocean", surface: "surface", level: "currents"});

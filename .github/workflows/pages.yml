@@ -29,11 +29,17 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Fetch latest GFS wind data
+      - run: pip install eccodes
+
+      - name: Fetch GFS data (wind, RH, MSLP, precipitation)
         continue-on-error: true  # keep the committed data if NOMADS is unavailable
-        run: |
-          pip install eccodes
-          python3 scripts/fetch-gfs-wind.py 925 surface --timeline --past-hours 48 --forecast-hours 72
+        timeout-minutes: 40
+        run: python3 scripts/fetch-weather.py gfs 925 surface --timeline --past-hours 48 --forecast-hours 72
+
+      - name: Fetch ECMWF open data (wind, RH, MSLP, precipitation)
+        continue-on-error: true
+        timeout-minutes: 40
+        run: python3 scripts/fetch-weather.py ecmwf 925 surface --timeline --past-hours 48 --forecast-hours 72
 
       - name: Version asset URLs so browsers load new JS/CSS after each deploy
         run: |

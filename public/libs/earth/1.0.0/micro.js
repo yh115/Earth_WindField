@@ -533,6 +533,7 @@ var µ = function() {
                 orientation: "",
                 topology: TOPOLOGY,
                 overlayType: "default",
+                model: "gfs",
                 showGridPoints: false
             };
             coalesce(tokens[9], "").split("/").forEach(function(segment) {
@@ -545,6 +546,11 @@ var µ = function() {
                 else if ((option = /^overlay=(\w+)$/.exec(segment))) {
                     if (overlayTypes.has(option[1]) || option[1] === "default") {
                         result.overlayType = option[1];
+                    }
+                }
+                else if ((option = /^model=(\w+)$/.exec(segment))) {
+                    if (option[1] === "ecmwf") {
+                        result.model = option[1];
                     }
                 }
                 else if ((option = /^grid=(\w+)$/.exec(segment))) {
@@ -576,7 +582,8 @@ var µ = function() {
             var proj = [attr.projection, attr.orientation].filter(isTruthy).join("=");
             var ol = !isValue(attr.overlayType) || attr.overlayType === "default" ? "" : "overlay=" + attr.overlayType;
             var grid = attr.showGridPoints ? "grid=on" : "";
-            return [dir, attr.param, attr.surface, attr.level, ol, proj, grid].filter(isTruthy).join("/");
+            var model = attr.model === "ecmwf" ? "model=ecmwf" : "";
+            return [dir, attr.param, attr.surface, attr.level, model, ol, proj, grid].filter(isTruthy).join("/");
         },
 
         /**
