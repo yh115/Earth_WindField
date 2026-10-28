@@ -35,6 +35,11 @@ jobs:
           pip install eccodes
           python3 scripts/fetch-gfs-wind.py 925 surface --timeline --past-hours 48 --forecast-hours 72
 
+      - name: Version asset URLs so browsers load new JS/CSS after each deploy
+        run: |
+          sed -i -E 's#((src|href)="(\.\./)?(libs|styles)/[^"?]*\.(js|css))"#\1?v='"${GITHUB_SHA::8}"'"#g' \
+            public/index.html public/jp/index.html
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
