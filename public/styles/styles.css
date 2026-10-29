@@ -187,6 +187,12 @@ body {
     padding-right: 0.25rem;
 }
 
+#credits {
+    font-size: 1.1rem;
+    color: #888888;
+    padding-top: 0.5rem;
+}
+
 #lang {
     font-size: 1.25rem;
     float: right;
