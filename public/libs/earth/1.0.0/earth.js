@@ -728,8 +728,7 @@
         µ.loadJson(µ.siteRoot + "data/weather/current/run-" + model + ".json?t=" + Date.now()).then(function(run) {
             if ((configuration.get("model") === "ecmwf" ? "ecmwf" : "gfs") === model) {
                 var date = new Date(run.refTime);
-                var utc = µ.toUTCISO(date), local = µ.toLocalISO(date);
-                d3.select("#model-run").text(utc.substring(0, 13) + "Z (" + local.substring(11) + " Local)");
+                d3.select("#model-run").text(µ.toUTCISO(date).substring(0, 13) + "Z");
             }
         }).otherwise(function() {
             d3.select("#model-run").text("–");
