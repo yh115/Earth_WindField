@@ -31,12 +31,12 @@ jobs:
 
       - run: pip install eccodes
 
-      - name: Fetch GFS data (wind, RH, MSLP, precipitation)
+      - name: Fetch GFS data (wind, temperature, RH, MSLP, precipitation)
         continue-on-error: true  # keep the committed data if NOMADS is unavailable
         timeout-minutes: 40
         run: python3 scripts/fetch-weather.py gfs 1000 925 850 700 500 surface --timeline --past-hours 48 --forecast-hours 72
 
-      - name: Fetch ECMWF open data (wind, RH, MSLP, precipitation)
+      - name: Fetch ECMWF open data (wind, temperature, RH, MSLP, precipitation)
         continue-on-error: true
         timeout-minutes: 40
         run: python3 scripts/fetch-weather.py ecmwf 1000 925 850 700 500 surface --timeline --past-hours 48 --forecast-hours 72

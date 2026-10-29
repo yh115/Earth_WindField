@@ -54,7 +54,7 @@ def gfs_download(cycle, fhour, levels):
     if "surface" in levels:
         lev += ["lev_10_m_above_ground=on", "lev_2_m_above_ground=on"]
     lev += ["lev_mean_sea_level=on", "lev_surface=on"]
-    url = "%s?file=gfs.t%02dz.pgrb2.1p00.f%03d&%s&var_UGRD=on&var_VGRD=on&var_RH=on&var_PRMSL=on&var_APCP=on" \
+    url = "%s?file=gfs.t%02dz.pgrb2.1p00.f%03d&%s&var_UGRD=on&var_VGRD=on&var_RH=on&var_TMP=on&var_PRMSL=on&var_APCP=on" \
           "&dir=%%2Fgfs.%s%%2F%02d%%2Fatmos" % (GFS_URL, cycle.hour, fhour, "&".join(lev),
                                                cycle.strftime("%Y%m%d"), cycle.hour)
     data = http_get(url)
@@ -74,7 +74,7 @@ def ecmwf_download(cycle, fhour, levels):
         wanted = []
         for line in index.decode().splitlines():
             r = json.loads(line)
-            if (r["levtype"] == "pl" and r.get("levelist") in isobaric and r["param"] in ("u", "v", "r")) or \
+            if (r["levtype"] == "pl" and r.get("levelist") in isobaric and r["param"] in ("u", "v", "r", "t")) or \
                     (r["levtype"] == "sfc" and r["param"] in surface):
                 wanted.append(r)
         ranges = [{"Range": "bytes=%d-%d" % (r["_offset"], r["_offset"] + r["_length"] - 1)} for r in wanted]
@@ -126,7 +126,7 @@ def record(field, decimals, name, values=None, **header):
 
 
 def to_products(fields, levels):
-    """Maps decoded fields to {(type, layer): [records]} for wind, relative humidity and MSLP."""
+    """Maps decoded fields to {(type, layer): [records]} for wind, temperature, relative humidity and MSLP."""
     by = {}
     for f in fields:
         by.setdefault((f.short, f.level), f)
@@ -135,6 +135,7 @@ def to_products(fields, levels):
         if level == "surface":
             layer, u, v, rh = "surface-level", by.get(("10u", 10)), by.get(("10v", 10)), by.get(("2r", 2))
             t, td = by.get(("2t", 2)), by.get(("2d", 2))
+            temp = t
             if rh is None and t is not None and td is not None:  # ECMWF has no 2 m RH: derive it (Magnus formula)
                 tc, tdc = t.values - 273.15, td.values - 273.15
                 values = np.clip(100 * np.exp(17.625 * tdc / (243.04 + tdc) - 17.625 * tc / (243.04 + tc)), 0, 100)
@@ -143,8 +144,11 @@ def to_products(fields, levels):
         else:
             layer = "isobaric-%shPa" % level
             u, v, rh = by.get(("u", int(level))), by.get(("v", int(level))), by.get(("r", int(level)))
+            temp = by.get(("t", int(level)))
         if u is not None and v is not None:
             out[("wind", layer)] = [record(u, 2, "U-component_of_wind"), record(v, 2, "V-component_of_wind")]
+        if temp is not None:
+            out[("temp", layer)] = [record(temp, 1, "Temperature")]
         if rh is not None:
             out[("relative_humidity", layer)] = [record(rh, 0, "Relative_humidity")]
     msl = by.get(("prmsl", 0)) or by.get(("msl", 0))
