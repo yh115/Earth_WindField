@@ -246,6 +246,8 @@ def main():
     latest = dt.datetime.strptime(a.cycle, "%Y%m%d%H") if a.cycle else latest_cycle(src)
     if not fetch_slot(src, latest, latest, dated=False):
         raise RuntimeError("no %s data for %s" % (a.model, latest))
+    with open(os.path.join(WEATHER_DIR, "current", "run-%s.json" % a.model), "w") as f:
+        json.dump({"model": a.model, "refTime": latest.strftime("%Y-%m-%dT%H:00:00.000Z")}, f)
     print("wrote current %s %s (%s)" % (a.model, ", ".join(a.levels), latest.strftime("%Y-%m-%d %HZ")))
     if a.timeline:
         valid, end, written = latest - dt.timedelta(hours=a.past_hours), latest + dt.timedelta(hours=a.forecast_hours), 0

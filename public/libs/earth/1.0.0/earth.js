@@ -721,6 +721,22 @@
     }
 
     /**
+     * Display the latest run (initialisation time) of the selected weather model in the menu.
+     */
+    function showModelRun() {
+        var model = configuration.get("model") === "ecmwf" ? "ecmwf" : "gfs";
+        µ.loadJson(µ.siteRoot + "data/weather/current/run-" + model + ".json?t=" + Date.now()).then(function(run) {
+            if ((configuration.get("model") === "ecmwf" ? "ecmwf" : "gfs") === model) {
+                var date = new Date(run.refTime);
+                var utc = µ.toUTCISO(date), local = µ.toLocalISO(date);
+                d3.select("#model-run").text(utc.substring(0, 13) + "Z (" + local.substring(11) + " Local)");
+            }
+        }).otherwise(function() {
+            d3.select("#model-run").text("–");
+        });
+    }
+
+    /**
      * Display the grids' types in the menu.
      */
     function showGridDetails(grids) {
@@ -1095,6 +1111,8 @@
         // Add handlers for the weather model buttons.
         bindButtonToConfiguration("#model-gfs", {model: "gfs"});
         bindButtonToConfiguration("#model-ecmwf", {model: "ecmwf"});
+        configuration.on("change:model", showModelRun);
+        showModelRun();
 
         // Add handlers for ocean animation types.
         bindButtonToConfiguration("#animate-currents", {param: "ocean", surface: "surface", level: "currents"});
